@@ -41,6 +41,7 @@ import org.apache.camel.model.rest.VerbDefinition;
 import org.apache.camel.spi.Resource;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.EndpointHelper;
+import org.apache.camel.support.ResourceHelper;
 import org.apache.camel.support.ResourceSupport;
 import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.ObjectHelper;
@@ -775,7 +776,7 @@ public final class RouteDefinitionHelper {
                 try {
                     String lines = IOHelper.loadText(is);
                     Iterator<String> it = Arrays.stream(lines.split("\n")).iterator();
-                    // skip first two lines
+                    // skip first line
                     it.next();
                     String first = it.next();
 
@@ -787,19 +788,7 @@ public final class RouteDefinitionHelper {
                         }
                     }
                     if (route.getResource() == null) {
-                        // build a pseudo resource (TODO: make as inner class)
-                        Resource res = new ResourceSupport("class", builder.getName()) {
-                            @Override
-                            public boolean exists() {
-                                return false;
-                            }
-
-                            @Override
-                            public InputStream getInputStream() throws IOException {
-                                return null;
-                            }
-                        };
-                        route.setResource(res);
+                        route.setResource(ResourceHelper.fromClass(builder));
                     }
 
                     Iterator<ProcessorDefinition> col = ProcessorDefinitionHelper

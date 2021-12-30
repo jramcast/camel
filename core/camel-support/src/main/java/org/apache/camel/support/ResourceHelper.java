@@ -290,4 +290,24 @@ public final class ResourceHelper {
     public static Resource fromString(String location, String content) {
         return fromBytes(location, content.getBytes(StandardCharsets.UTF_8));
     }
+
+    /**
+     * Create a dummy {@link Resource} from an existing class.
+     *
+     * @param  clazz    the class
+     * @return          a resource wrapping the given class.
+     */
+    public static Resource fromClass(Class<?> clazz) {
+        return new ResourceSupport("class", clazz.getName()) {
+            @Override
+            public boolean exists() {
+                return false;
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+        };
+    }
 }

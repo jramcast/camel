@@ -21,8 +21,10 @@ import java.io.IOError;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.camel.language.csimple.CSimpleCodeGenerator;
@@ -140,11 +142,23 @@ public class GenerateMojo extends AbstractExecMojo {
         if (!nodes.isEmpty()) {
             getLog().info("Discovered " + classes + " Java DSL classes");
 
+            Map<String, String> data = new HashMap<>();
+
             for (CamelNodeDetails node : nodes) {
                 String fqn = node.getClassName();
-                String tree = node.dump(0);
-                String text = "# " + GENERATED_MSG + "\n" + tree;
                 String fileName = fqn + ".dump";
+                String text = node.dump(0);
+                if (data.containsKey(fileName)) {
+                    String old = data.get(fileName);
+                    text = old + "\n" + text;
+                }
+                data.put(fileName, text);
+            }
+
+            for (Map.Entry<String, String> entry : data.entrySet()) {
+                String fileName = entry.getKey();
+                String text = entry.getValue();
+                text = "# " + GENERATED_MSG + "\n" + text;
                 outputResourceDir.mkdirs();
                 boolean saved = updateResource(outputResourceDir.toPath().resolve(fileName), text);
                 if (saved) {
