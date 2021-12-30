@@ -16,7 +16,6 @@
  */
 package org.apache.camel.model;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -38,11 +37,9 @@ import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.ErrorHandlerBuilder;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.model.rest.VerbDefinition;
-import org.apache.camel.spi.Resource;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.EndpointHelper;
 import org.apache.camel.support.ResourceHelper;
-import org.apache.camel.support.ResourceSupport;
 import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StringHelper;

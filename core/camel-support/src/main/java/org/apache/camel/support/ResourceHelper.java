@@ -294,8 +294,8 @@ public final class ResourceHelper {
     /**
      * Create a dummy {@link Resource} from an existing class.
      *
-     * @param  clazz    the class
-     * @return          a resource wrapping the given class.
+     * @param  clazz the class
+     * @return       a resource wrapping the given class.
      */
     public static Resource fromClass(Class<?> clazz) {
         return new ResourceSupport("class", clazz.getName()) {
