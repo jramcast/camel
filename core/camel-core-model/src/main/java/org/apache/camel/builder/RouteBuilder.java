@@ -498,7 +498,7 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
 
         // ensure routes are prepared before being populated
         for (RouteDefinition route : routeCollection.getRoutes()) {
-            routeCollection.prepareRoute(route);
+            routeCollection.prepareRoute(route, this.getClass());
         }
         populateRoutes();
 
@@ -523,7 +523,7 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
 
         // ensure routes are prepared before being populated
         for (RouteDefinition route : routeCollection.getRoutes()) {
-            routeCollection.prepareRoute(route);
+            routeCollection.prepareRoute(route, this.getClass());
         }
 
         // trigger update of the routes
@@ -611,7 +611,7 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
 
             for (RouteDefinition route : getRouteCollection().getRoutes()) {
                 // ensure the route is prepared after configure method is complete
-                getRouteCollection().prepareRoute(route);
+                getRouteCollection().prepareRoute(route, this.getClass());
             }
 
             for (RouteBuilderLifecycleStrategy interceptor : lifecycleInterceptors) {

@@ -2,7 +2,7 @@
 
 The Camel Compile Simple Maven Plugin supports the following goals
 
- - camel-report:generate - To generate source code for csimple language
+ - camel-csimple:generate - To generate source code for csimple language
 
 == camel:generate
 

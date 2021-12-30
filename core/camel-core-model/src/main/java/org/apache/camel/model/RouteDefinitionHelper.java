@@ -16,12 +16,16 @@
  */
 package org.apache.camel.model;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +38,13 @@ import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.ErrorHandlerBuilder;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.model.rest.VerbDefinition;
+import org.apache.camel.spi.Resource;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.EndpointHelper;
+import org.apache.camel.support.ResourceSupport;
+import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.ObjectHelper;
+import org.apache.camel.util.StringHelper;
 import org.apache.camel.util.URISupport;
 
 import static org.apache.camel.model.ProcessorDefinitionHelper.filterTypeInOutputs;
@@ -755,6 +763,78 @@ public final class RouteDefinitionHelper {
             return route.substring(0, 60) + "...";
         } else {
             return route;
+        }
+    }
+
+    public static void prepareJavaDslRoute(CamelContext camelContext, RouteDefinition route, Class<?> builder) {
+        String fqn = builder != null ? builder.getName() : null;
+        if (fqn != null) {
+            String name = "META-INF/services/org/apache/camel/java-dsl/" + fqn + ".dump";
+            InputStream is = camelContext.adapt(ExtendedCamelContext.class).getClassResolver().loadResourceAsStream(name);
+            if (is != null) {
+                try {
+                    String lines = IOHelper.loadText(is);
+                    Iterator<String> it = Arrays.stream(lines.split("\n")).iterator();
+                    // skip first two lines
+                    it.next();
+                    String first = it.next();
+
+                    if (route.getInput().getLineNumber() < 0) {
+                        String digit = StringHelper.before(first, "\t");
+                        if (digit != null) {
+                            int num = Integer.parseInt(digit);
+                            route.getInput().setLineNumber(num);
+                        }
+                    }
+                    if (route.getResource() == null) {
+                        // build a pseudo resource (TODO: make as inner class)
+                        Resource res = new ResourceSupport("class", builder.getName()) {
+                            @Override
+                            public boolean exists() {
+                                return false;
+                            }
+
+                            @Override
+                            public InputStream getInputStream() throws IOException {
+                                return null;
+                            }
+                        };
+                        route.setResource(res);
+                    }
+
+                    Iterator<ProcessorDefinition> col = ProcessorDefinitionHelper
+                            .filterTypeInOutputs(route.getOutputs(), ProcessorDefinition.class).iterator();
+
+                    while (it.hasNext() && col.hasNext()) {
+                        String line = it.next();
+                        ProcessorDefinition<?> def = col.next();
+
+                        if (def instanceof WhenDefinition || def instanceof OtherwiseDefinition) {
+                            // skip these as they are not in the dump
+                            def = col.next();
+                        }
+                        if (def != null) {
+                            int num = def.getLineNumber();
+                            if (num < 0) {
+                                // parse line
+                                String digit = StringHelper.before(line, "\t");
+                                if (digit != null) {
+                                    try {
+                                        num = Integer.parseInt(digit);
+                                        def.setLineNumber(num);
+                                    } catch (Exception e) {
+                                        // ignore
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // ignore
+                } finally {
+                    IOHelper.close(is);
+                }
+            }
         }
     }
 }

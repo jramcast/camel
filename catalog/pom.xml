@@ -45,6 +45,7 @@
         <!-- tooling that depends on catalog -->
         <module>camel-route-parser</module>
         <module>camel-csimple-maven-plugin</module>
+        <module>camel-java-dsl-maven-plugin</module>
         <module>camel-report-maven-plugin</module>
     </modules>
 
