@@ -225,7 +225,7 @@ public class RoutesDefinition extends OptionalIdentifiedDefinition<RoutesDefinit
         return route;
     }
 
-    public void prepareRoute(RouteDefinition route, Class<?> builder) {
+    public void prepareRoute(RouteDefinition route, Class<?> builder, int index) {
         if (route.isPrepared()) {
             return;
         }
@@ -279,7 +279,7 @@ public class RoutesDefinition extends OptionalIdentifiedDefinition<RoutesDefinit
         RouteDefinitionHelper.prepareRoute(getCamelContext(), route, oe, icp, ifrom, ito, oc);
 
         // enrich the route with line number details if we have metadata when using Java compiled routes
-        RouteDefinitionHelper.prepareJavaDslRoute(camelContext, route, builder);
+        RouteDefinitionHelper.prepareJavaDslRoute(camelContext, route, builder, index);
 
         if (LOG.isDebugEnabled() && route.getAppliedRouteConfigurationIds() != null) {
             LOG.debug("Route: {} is using route configurations ids: {}", route.getId(),

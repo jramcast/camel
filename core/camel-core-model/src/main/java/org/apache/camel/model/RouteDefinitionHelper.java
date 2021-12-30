@@ -764,7 +764,7 @@ public final class RouteDefinitionHelper {
         }
     }
 
-    public static void prepareJavaDslRoute(CamelContext camelContext, RouteDefinition route, Class<?> builder) {
+    public static void prepareJavaDslRoute(CamelContext camelContext, RouteDefinition route, Class<?> builder, int index) {
         String fqn = builder != null ? builder.getName() : null;
         if (fqn != null) {
             String name = "META-INF/services/org/apache/camel/java-dsl/" + fqn + ".dump";
@@ -773,9 +773,16 @@ public final class RouteDefinitionHelper {
                 try {
                     String lines = IOHelper.loadText(is);
                     Iterator<String> it = Arrays.stream(lines.split("\n")).iterator();
-                    // skip first line
-                    it.next();
-                    String first = it.next();
+
+                    // spool forward to the route index we want
+                    int pos = -1;
+                    String first = "";
+                    while (it.hasNext() && pos < index) {
+                        first = it.next();
+                        if (first.contains("\tfrom")) {
+                            pos++;
+                        }
+                    }
 
                     if (route.getInput().getLineNumber() < 0) {
                         String digit = StringHelper.before(first, "\t");

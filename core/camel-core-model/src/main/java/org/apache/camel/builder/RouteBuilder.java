@@ -497,8 +497,9 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         populateRouteTemplates();
 
         // ensure routes are prepared before being populated
-        for (RouteDefinition route : routeCollection.getRoutes()) {
-            routeCollection.prepareRoute(route, this.getClass());
+        for (int i = 0; i < routeCollection.getRoutes().size(); i++) {
+            RouteDefinition route = routeCollection.getRoutes().get(i);
+            routeCollection.prepareRoute(route, this.getClass(), i);
         }
         populateRoutes();
 
@@ -522,8 +523,9 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         populateRouteTemplates();
 
         // ensure routes are prepared before being populated
-        for (RouteDefinition route : routeCollection.getRoutes()) {
-            routeCollection.prepareRoute(route, this.getClass());
+        for (int i = 0; i < routeCollection.getRoutes().size(); i++) {
+            RouteDefinition route = routeCollection.getRoutes().get(i);
+            routeCollection.prepareRoute(route, this.getClass(), i);
         }
 
         // trigger update of the routes
@@ -609,9 +611,9 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
             // remember the source resource
             getRouteCollection().setResource(getResource());
 
-            for (RouteDefinition route : getRouteCollection().getRoutes()) {
-                // ensure the route is prepared after configure method is complete
-                getRouteCollection().prepareRoute(route, this.getClass());
+            for (int i = 0; i < routeCollection.getRoutes().size(); i++) {
+                RouteDefinition route = routeCollection.getRoutes().get(i);
+                routeCollection.prepareRoute(route, this.getClass(), i);
             }
 
             for (RouteBuilderLifecycleStrategy interceptor : lifecycleInterceptors) {
